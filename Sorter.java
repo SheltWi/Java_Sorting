@@ -16,7 +16,7 @@ public class Sorter {
         int count = Integer.parseInt(scanner.nextLine());
         
         if (count <= 0) {
-            System.out.println("Количество элементов должно быть положительным числом.");
+            System.out.println("Количество элементов должно быть положительным числом...");
             return;
         }
         
