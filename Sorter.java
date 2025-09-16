@@ -16,7 +16,7 @@ public class Sorter {
         int count = Integer.parseInt(scanner.nextLine());
         
         if (count <= 0) {
-            System.out.println("Количество элементов должно быть положительным числом...");
+            System.out.println("Количество элементов должно быть положительным числом.");
             return;
         }
         
@@ -28,7 +28,7 @@ public class Sorter {
         System.out.println("Элементы успешно добавлены.");
     }
     
-    public void randomInsertWithChoice(Scanner scanner) {
+    public void randomInsertWithChoiceAndRange(Scanner scanner) {
         System.out.print("Введите количество элементов: ");
         int count = Integer.parseInt(scanner.nextLine());
         
@@ -37,15 +37,26 @@ public class Sorter {
             return;
         }
         
-        randomInsert(count);
+        System.out.print("Введите минимальное значение: ");
+        int min = Integer.parseInt(scanner.nextLine());
+        
+        System.out.print("Введите максимальное значение: ");
+        int max = Integer.parseInt(scanner.nextLine());
+        
+        if (min >= max) {
+            System.out.println("Минимальное значение должно быть меньше максимального.");
+            return;
+        }
+        
+        randomInsert(count, min, max);
     }
     
-    public void randomInsert(int count) {
+    public void randomInsert(int count, int min, int max) {
         array = new int[count];
         for (int i = 0; i < count; i++) {
-            array[i] = random.nextInt(1000);
+            array[i] = random.nextInt(max - min + 1) + min;
         }
-        System.out.println("Добавлено " + count + " случайных элементов.");
+        System.out.println("Добавлено " + count + " случайных элементов в диапазоне [" + min + ", " + max + "]");
     }
     
     public void printArray() {
@@ -154,26 +165,90 @@ public class Sorter {
         array = arrayToSort;
     }
     
+    public void performShakerSort() {
+        if (array.length == 0) {
+            System.out.println("Массив пуст. Сначала добавьте элементы.");
+            return;
+        }
+        
+        System.out.println("Исходный массив: " + Arrays.toString(array));
+        
+        int[] arrayToSort = Arrays.copyOf(array, array.length);
+        
+        long startTime = System.nanoTime();
+        shakerSort(arrayToSort);
+        long endTime = System.nanoTime();
+        
+        long duration = (endTime - startTime);
+        
+        System.out.println("Отсортированный массив: " + Arrays.toString(arrayToSort));
+        System.out.println("Время сортировки: " + duration + " наносекунд (" + 
+                          (duration / 1_000_000.0) + " миллисекунд)");
+        
+        // Обновляем основной массив
+        array = arrayToSort;
+    }
+    
+    public void performQuickSort() {
+        if (array.length == 0) {
+            System.out.println("Массив пуст. Сначала добавьте элементы.");
+            return;
+        }
+        
+        System.out.println("Исходный массив: " + Arrays.toString(array));
+        
+        int[] arrayToSort = Arrays.copyOf(array, array.length);
+        
+        long startTime = System.nanoTime();
+        quickSort(arrayToSort, 0, arrayToSort.length - 1);
+        long endTime = System.nanoTime();
+        
+        long duration = (endTime - startTime);
+        
+        System.out.println("Отсортированный массив: " + Arrays.toString(arrayToSort));
+        System.out.println("Время сортировки: " + duration + " наносекунд (" + 
+                          (duration / 1_000_000.0) + " миллисекунд)");
+        
+        // Обновляем основной массив
+        array = arrayToSort;
+    }
+    
+    public void performMergeSort() {
+        if (array.length == 0) {
+            System.out.println("Массив пуст. Сначала добавьте элементы.");
+            return;
+        }
+        
+        System.out.println("Исходный массив: " + Arrays.toString(array));
+        
+        int[] arrayToSort = Arrays.copyOf(array, array.length);
+        
+        long startTime = System.nanoTime();
+        mergeSort(arrayToSort, 0, arrayToSort.length - 1);
+        long endTime = System.nanoTime();
+        
+        long duration = (endTime - startTime);
+        
+        System.out.println("Отсортированный массив: " + Arrays.toString(arrayToSort));
+        System.out.println("Время сортировки: " + duration + " наносекунд (" + 
+                          (duration / 1_000_000.0) + " миллисекунд)");
+        
+        // Обновляем основной массив
+        array = arrayToSort;
+    }
+    
     private void bubbleSort(int[] arr) {
         int n = arr.length;
-
         for (int i = 0; i < n - 1; i++) {
-            boolean flag = false;
             for (int j = 0; j < n - i - 1; j++) {
                 if (arr[j] > arr[j + 1]) {
                     int temp = arr[j];
-                    arr[j] = arr[j + 1]; // swap
+                    arr[j] = arr[j + 1];
                     arr[j + 1] = temp;
-                    flag = true;
-                } 
-            }
-                if (!flag){
-                    System.out.println("Узбагойся");
-                    break;
                 }
             }
         }
-    
+    }
     
     private void selectionSort(int[] arr) {
         int n = arr.length;
@@ -204,9 +279,126 @@ public class Sorter {
             // на одну позицию вперед от их текущей позиции
             while (j >= 0 && arr[j] > key) {
                 arr[j + 1] = arr[j];
-                j--;
+                j = j - 1;
             }
             arr[j + 1] = key;
+        }
+    }
+    
+    private void shakerSort(int[] arr) {
+        int left = 0;
+        int right = arr.length - 1;
+        boolean swapped = true;
+        
+        while (swapped) {
+            swapped = false;
+            
+            // Проход слева направо
+            for (int i = left; i < right; i++) {
+                if (arr[i] > arr[i + 1]) {
+                    int temp = arr[i];
+                    arr[i] = arr[i + 1];
+                    arr[i + 1] = temp;
+                    swapped = true;
+                }
+            }
+            
+            if (!swapped) break;
+            
+            right--;
+            swapped = false;
+            
+            // Проход справа налево
+            for (int i = right; i > left; i--) {
+                if (arr[i] < arr[i - 1]) {
+                    int temp = arr[i];
+                    arr[i] = arr[i - 1];
+                    arr[i - 1] = temp;
+                    swapped = true;
+                }
+            }
+            
+            left++;
+        }
+    }
+    
+    private void quickSort(int[] arr, int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+            
+            quickSort(arr, low, pi - 1);
+            quickSort(arr, pi + 1, high);
+        }
+    }
+    
+    private int partition(int[] arr, int low, int high) {
+        int pivot = arr[high];
+        int i = (low - 1);
+        
+        for (int j = low; j < high; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+                
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+        
+        return i + 1;
+    }
+    
+    private void mergeSort(int[] arr, int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            
+            mergeSort(arr, left, mid);
+            mergeSort(arr, mid + 1, right);
+            
+            merge(arr, left, mid, right);
+        }
+    }
+    
+    private void merge(int[] arr, int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+        
+        int[] L = new int[n1];
+        int[] R = new int[n2];
+        
+        for (int i = 0; i < n1; i++)
+            L[i] = arr[left + i];
+        for (int j = 0; j < n2; j++)
+            R[j] = arr[mid + 1 + j];
+        
+        int i = 0, j = 0;
+        int k = left;
+        
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                i++;
+            } else {
+                arr[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+        
+        while (i < n1) {
+            arr[k] = L[i];
+            i++;
+            k++;
+        }
+        
+        while (j < n2) {
+            arr[k] = R[j];
+            j++;
+            k++;
         }
     }
     
